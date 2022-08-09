@@ -1,23 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import './app.css'
+import Listjob from './components/Listjob';
+import SearchBar from './components/SearchBar';
+
+import { useState, useEffect } from 'react';
+import { getJobs, getJobData } from './api';
 
 function App() {
+  const [jobs, setJobs] = useState([])
+
+  const fetchJobs = async () => {
+    try {
+      const datajobs = await getJobs('categories/programming/jobs?per_page=10&page=1')
+
+      // const res = await datas.json()
+      console.log(datajobs)
+      // setJobs(datajobs.data)
+      const promises = datajobs.data.map(async (job) => {
+        setTimeout(async () => {
+          return await getJobs(`seniorities/${job.attributes.seniority.data.id}`)
+        }, 500)
+      })
+
+      const data = await Promise.all(promises)
+      console.log(data)
+      //setJobs(data)
+    } catch (error) {
+
+    }
+  }
+
+  useEffect(() => {
+    // console.log('inside useEffect')
+    fetchJobs()
+  }, [])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div className="App">
+        <div>
+          <SearchBar />
+          {/* <Listjob jobs={jobs} /> */}
+        </div>
+      </div>
     </div>
   );
 }
